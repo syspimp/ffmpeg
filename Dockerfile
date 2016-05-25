@@ -4,14 +4,19 @@
 #
 # https://hub.docker.com/r/jrottenberg/ffmpeg/
 #
+# Forked by David Taylor based on work by 
+#MAINTAINER  Julien Rottenberg <julien@rottenberg.info>
 #
 FROM        centos:7
-MAINTAINER  Julien Rottenberg <julien@rottenberg.info>
+MAINTAINER  David Taylor <syspimp@maskedadmins.com>
 
 
-CMD         ["--help"]
-ENTRYPOINT  ["ffmpeg"]
+CMD         ["-h"]
+ADD         start-streaming.sh /opt
+ADD         ffserver.conf /etc
+ENTRYPOINT  ["/opt/start-streaming.sh"]
 WORKDIR     /tmp/workdir
+EXPOSE      8090
 
 
 ENV         FFMPEG_VERSION=3.0.2 \
@@ -194,7 +199,9 @@ RUN     export MAKEFLAGS="-j$[$(nproc) + 1]" && \
         cp qt-faststart ${SRC}/bin && \
         rm -rf ${DIR} && \
         yum history -y undo last && yum clean all && rm -rf /var/lib/yum/* && \
-        ffmpeg -buildconf
+        ffmpeg -buildconf && \
+# enable script
+        chmod +x /opt/start-streaming.sh
 
 
 
